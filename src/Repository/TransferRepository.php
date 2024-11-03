@@ -15,11 +15,12 @@ class TransferRepository extends ServiceEntityRepository
     public const CACHE_TAG = 'TransferRepository';
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry                         $registry,
         private readonly TagAwareCacheInterface $cache,
-        private readonly SeizoenRepository $seizoenRepository,
-        private readonly PloegRepository $ploegRepository,
-    ) {
+        private readonly SeizoenRepository      $seizoenRepository,
+        private readonly PloegRepository        $ploegRepository, private readonly ManagerRegistry $managerRegistry,
+    )
+    {
         parent::__construct($registry, Transfer::class);
     }
 
@@ -52,7 +53,7 @@ class TransferRepository extends ServiceEntityRepository
             ->createQueryBuilder('t')
             ->where('t.ploegNaar IS NOT NULL')
             ->andWhere('t.seizoen = :seizoen')
-            ->setParameters(['seizoen' => $seizoen])
+            ->setParameter('seizoen', $seizoen)
             ->setMaxResults($limit)
             ->orderBy('t.datum', 'DESC');
         if (null !== $ploegNaar) {
@@ -106,7 +107,7 @@ class TransferRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('t')
             ->where('t.renner = :renner')
             ->andWhere('t.datum <= :datum')->andWhere('t.seizoen = :seizoen')->
-            setParameters($params)->orderBy('t.datum', 'DESC')->setMaxResults(1);
+            setParameters(Util::buildParameters($params))->orderBy('t.datum', 'DESC')->setMaxResults(1);
         $res = $qb->getQuery()->getResult();
         if (0 == count($res)) {
             return null;
@@ -134,14 +135,14 @@ class TransferRepository extends ServiceEntityRepository
             $qb2->orWhere('t2.renner IN (:draftrenners)');
             $params['draftrenners'] = $draftrenners;
         }
-        $qb2->setParameters($params);
+        $qb2->setParameters(Util::buildParameters($params));
 
         $tQb
             ->where('t.transferType != :drafttransfer')
             ->andWhere('t.ploegNaar = :ploeg')
             ->andWhere('t.seizoen = :seizoen')
             ->andWhere($tQb->expr()->notIn('t', $qb2->getDql()))
-            ->setParameters($params);
+            ->setParameters(Util::buildParameters($params));
         return $tQb->getQuery()->getResult();
     }
 
@@ -151,28 +152,11 @@ class TransferRepository extends ServiceEntityRepository
      */
     public function generateTempTableWithDraftRiders(Seizoen $seizoen, string $tableName = 'draftriders'): void
     {
-        $conn = $this->_em->getConnection();
+        $conn = $this->managerRegistry->getConnection();
         $conn->executeQuery("DROP TABLE IF EXISTS $tableName; CREATE TEMPORARY TABLE " . $tableName . ' (ploeg_id int, renner_id int) ENGINE=MEMORY');
         $conn->executeQuery('INSERT INTO ' . $tableName . '
           ( SELECT ploegNaar_id, renner_id FROM transfer t
           WHERE t.transferType = ' . Transfer::DRAFTTRANSFER . ' AND t.seizoen_id = ' . $seizoen->getId() . ' )');
-    }
-
-    public function generateTempTableWithTransferredRiders(Seizoen $seizoen, string $tableName = 'transferriders'): void
-    {
-        $this->generateTempTableWithDraftRiders($seizoen);
-        $conn = $this->_em->getConnection();
-        $conn->executeQuery("DROP TABLE IF EXISTS $tableName; CREATE TEMPORARY TABLE IF NOT EXISTS " . $tableName . ' (ploeg_id int, renner_id int) ENGINE=MEMORY');
-
-        $seizoenId = $seizoen->getId();
-
-        $a = "SELECT t.renner_id, t.ploegNaar_id
-                FROM transfer t
-                WHERE t.renner_id NOT IN ( SELECT dr.renner_id FROM draftriders dr WHERE dr.ploeg_id = t.ploegNaar_id )
-                AND t.seizoen_id = $seizoenId AND t.ploegNaar_id IS NOT NULL AND t.transferType <> " . Transfer::DRAFTTRANSFER . '
-                GROUP BY t.renner_id, t.ploegNaar_id
-                ORDER BY t.ploegNaar_id';
-        $conn->executeQuery("INSERT INTO $tableName (" . $a . ')');
     }
 
     public function hasDraftTransfer(Renner $renner, Ploeg $ploeg)
@@ -181,7 +165,7 @@ class TransferRepository extends ServiceEntityRepository
             ->where('t.renner = :rider')
             ->andWhere('t.ploegNaar = :team')
             ->andWhere('t.transferType = :type')
-            ->setParameters(['rider' => $renner, 'team' => $ploeg, 'type' => Transfer::DRAFTTRANSFER])
+            ->setParameters(Util::buildParameters(['rider' => $renner, 'team' => $ploeg, 'type' => Transfer::DRAFTTRANSFER]))
             ->getQuery()
             ->getOneOrNullResult();
     }

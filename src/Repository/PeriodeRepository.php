@@ -30,7 +30,9 @@ class PeriodeRepository extends ServiceEntityRepository
         try {
             return $qb->getQuery()->getSingleResult();
         } catch (UnexpectedResultException $e) {
-            $periods = $this->createQueryBuilder('p')->orderBy('p.start', 'ASC')->where('p.seizoen = :seizoen')->setParameter('seizoen', $seizoen)->setMaxResults(1)
+            $periods = $this->createQueryBuilder('p')->orderBy('p.start', 'ASC')
+                ->where('p.seizoen = :seizoen')
+                ->setParameter('seizoen', $seizoen)->setMaxResults(1)
                 ->getQuery()->getResult();
             return $periods[0] ?? null;
         }

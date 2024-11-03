@@ -13,9 +13,9 @@ use Doctrine\Persistence\ManagerRegistry;
 class RennerRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry $registry,
-        private readonly SeizoenRepository $seizoenRepository,
-        private readonly ContractRepository $contractRepository,
+        ManagerRegistry                     $registry,
+        private readonly SeizoenRepository  $seizoenRepository,
+        private readonly ContractRepository $contractRepository, private readonly ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($registry, Renner::class);
     }
@@ -48,13 +48,13 @@ class RennerRepository extends ServiceEntityRepository
      */
     public function isDraftTransfer(Renner $renner, Ploeg $ploeg)
     {
-        return (bool)$this->_em->getRepository(Transfer::class)->hasDraftTransfer($renner, $ploeg);
+        return (bool)$this->managerRegistry->getRepository(Transfer::class)->hasDraftTransfer($renner, $ploeg);
     }
 
     public function getRennersWithPuntenQueryBuilder($seizoen = null, $excludeWithTeam = false)
     {
         $this->resolveSeizoen($seizoen);
-        $puntenQb = $this->_em->getRepository(Uitslag::class)
+        $puntenQb = $this->managerRegistry->getRepository(Uitslag::class)
             ->createQueryBuilder('u')
             ->select('SUM(u.rennerPunten)')
             ->innerJoin('u.wedstrijd', 'w')

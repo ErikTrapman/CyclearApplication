@@ -163,7 +163,7 @@ class RennerController extends AbstractController
         foreach ($searchWords as $key => $searchWord) {
             $expressions = [];
             foreach ($searchFields as $key2 => $field) {
-                $expressions[] = $qb->expr()->like($qb->expr()->lower($field), ':query' . $key . $key2);
+                $expressions[] = $qb->expr()->like(\strtolower($field), ':query' . $key . $key2);
                 $qb->setParameter('query' . $key . $key2, '%' . strtolower($searchWord) . '%');
             }
             $qb->andWhere('(' . call_user_func_array([$qb->expr(), 'orx'], $expressions) . ')');

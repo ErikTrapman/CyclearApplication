@@ -25,7 +25,7 @@ class ContractRepository extends ServiceEntityRepository
             ->andWhere('c.seizoen = :seizoen')
             ->andWhere('c.eind IS NULL')
             ->orderBy('c.id', 'DESC');
-        $qb->setParameters(['renner' => $renner, 'seizoen' => $seizoen]);
+        $qb->setParameters(Util::buildParameters(['renner' => $renner, 'seizoen' => $seizoen]));
 
         $res = $qb->getQuery()->getResult();
         if (empty($res)) {
@@ -39,7 +39,7 @@ class ContractRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->where('c.renner = :renner')
             ->andWhere('c.seizoen = :seizoen');
-        $qb->setParameters(['renner' => $renner, 'seizoen' => $seizoen]);
+        $qb->setParameters(Util::buildParameters(['renner' => $renner, 'seizoen' => $seizoen]));
         if (null !== $ploeg) {
             $qb->andWhere('c.ploeg = :ploeg');
             $qb->setParameter('ploeg', $ploeg);
@@ -58,7 +58,7 @@ class ContractRepository extends ServiceEntityRepository
             ->where('c.renner = :renner')
             ->andWhere('c.seizoen = :seizoen')
             ->andWhere('c.eind IS NOT NULL');
-        $qb->setParameters(['renner' => $renner, 'seizoen' => $seizoen]);
+        $qb->setParameters(Util::buildParameters(['renner' => $renner, 'seizoen' => $seizoen]));
         if (null !== $ploeg) {
             $qb->andWhere('c.ploeg = :ploeg');
             $qb->setParameter('ploeg', $ploeg);

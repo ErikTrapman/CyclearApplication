@@ -38,7 +38,7 @@ class WedstrijdRepository extends ServiceEntityRepository
                 $qb->expr()->like('w.naam', ':stage1'),
                 $qb->expr()->like('w.naam', ':prol'))
         );
-        $qb->setParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stage1' => $stage1, 'prol' => $prologue]);
+        $qb->setParameters(Util::buildParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stage1' => $stage1, 'prol' => $prologue]));
         $res = $qb->getQuery()->getResult();
         if (0 === count($res)) {
             // try again with 'Stage 2' as we do not always register stage 1 if it's a TTT. It's the best we can get.
@@ -47,7 +47,7 @@ class WedstrijdRepository extends ServiceEntityRepository
                 $qb->expr()->orX(
                     $qb->expr()->like('w.naam', ':stage2'))
             );
-            $qb->setParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stage2' => sprintf('%s, Stage 2%%', $stage)]);
+            $qb->setParameters(Util::buildParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stage2' => sprintf('%s, Stage 2%%', $stage)]));
             $res = $qb->getQuery()->getResult();
             if (0 === count($res)) {
                 throw new CyclearGameBundleCQException('Unable to lookup refStage for ' . $wedstrijd->getNaam() . '. Have ' . count($res) . ' results');
@@ -81,7 +81,7 @@ class WedstrijdRepository extends ServiceEntityRepository
                 $qb->expr()->like('w.naam', ':stages'),
                 $qb->expr()->like('w.naam', ':prol'))
         );
-        $qb->setParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stages' => $stages, 'prol' => $prologue]);
+        $qb->setParameters(Util::buildParameters(['seizoen' => $wedstrijd->getSeizoen(), 'stages' => $stages, 'prol' => $prologue]));
         return $qb->getQuery()->getResult();
     }
 

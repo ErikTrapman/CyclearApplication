@@ -11,9 +11,9 @@ use Doctrine\Persistence\ManagerRegistry;
 class PloegRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry                     $registry,
         private readonly ContractRepository $contractRepository,
-        private readonly RennerRepository $rennerRepository,
+        private readonly RennerRepository   $rennerRepository, private readonly ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($registry, Ploeg::class);
     }
@@ -26,7 +26,7 @@ class PloegRepository extends ServiceEntityRepository
                      ->where('c.ploeg = :ploeg')
                      ->andWhere('c.seizoen = :seizoen')
                      ->andWhere('c.eind IS NULL')
-                     ->setParameters(['ploeg' => $ploeg, 'seizoen' => $ploeg->getSeizoen()])
+                     ->setParameters(Util::buildParameters(['ploeg' => $ploeg, 'seizoen' => $ploeg->getSeizoen()]))
                      ->orderBy('c.id', 'ASC')
                      ->getQuery()->getResult() as $contract) {
             $renners[] = $contract->getRenner();
@@ -42,14 +42,14 @@ class PloegRepository extends ServiceEntityRepository
             ->where('t.transferType = ' . Transfer::DRAFTTRANSFER)
             ->andWhere('t.ploegNaar = :ploeg')
             ->andWhere('t.seizoen = :seizoen')
-            ->setParameters(['ploeg' => $ploeg, 'seizoen' => $ploeg->getSeizoen()])->getQuery()->getResult();
+            ->setParameters(Util::buildParameters(['ploeg' => $ploeg, 'seizoen' => $ploeg->getSeizoen()]))->getQuery()->getResult();
     }
 
     public function getRennersWithPunten(Ploeg $ploeg): array
     {
         $renners = $this->getRenners($ploeg);
         $ret = [];
-        $uitslagRepo = $this->_em->getRepository(Uitslag::class);
+        $uitslagRepo = $this->managerRegistry->getRepository(Uitslag::class);
         foreach ($renners as $index => $renner) {
             $punten = $uitslagRepo->getPuntenForRennerWithPloeg($renner, $ploeg, $ploeg->getSeizoen());
             $ret[] = [0 => $renner, 'punten' => (int)$punten, 'index' => $index];
@@ -63,7 +63,7 @@ class PloegRepository extends ServiceEntityRepository
         $ret = [];
         $seizoen = $ploeg->getSeizoen();
         $renners = $this->getDraftRenners($ploeg);
-        $uitslagRepo = $this->_em->getRepository(Uitslag::class);
+        $uitslagRepo = $this->managerRegistry->getRepository(Uitslag::class);
         foreach ($renners as $index => $renner) {
             $rennerPunten = $uitslagRepo->getTotalPuntenForRenner($renner, $ploeg->getSeizoen());
             $punten = $rennerPunten;

@@ -63,7 +63,8 @@ class UitslagRepository extends ServiceEntityRepository
         $subQuery = $this->createQueryBuilder('u')
             ->select('ifnull(sum(u.ploegPunten),0)')
             ->innerJoin('u.wedstrijd', 'w')->where('w.seizoen = :seizoen')
-            ->andWhere('u.ploeg = p')->setParameters(['seizoen' => $seizoen]);
+            ->andWhere('u.ploeg = p')
+            ->setParameter('seizoen', $seizoen);
         if (null !== $maxDate) {
             $subQuery->andWhere('w.datum < :maxdate');
             $maxDate->setTime(0, 0, 0);
@@ -79,7 +80,7 @@ class UitslagRepository extends ServiceEntityRepository
             $params['ploeg'] = $ploeg;
         }
         $qb->orderBy('punten', 'DESC, p.afkorting ASC');
-        $qb->setParameters($params);
+        $qb->setParameters(Util::buildParameters($params));
         $value = $qb->getQuery()->getResult();
         $item->set($value);
         $item->tag(self::CACHE_TAG);
@@ -105,7 +106,7 @@ class UitslagRepository extends ServiceEntityRepository
             ->groupBy('p')
             ->orderBy('punten', 'DESC')
             ->addOrderBy('p.afkorting', 'ASC');
-        $qb->setParameters(['start' => $start, 'end' => $end, 'seizoen' => $seizoen]);
+        $qb->setParameters(Util::buildParameters(['start' => $start, 'end' => $end, 'seizoen' => $seizoen]));
         // flatten the result
         return array_map(function ($row) {
             return array_merge($row[0], ['punten' => $row['punten']]);
@@ -142,7 +143,7 @@ class UitslagRepository extends ServiceEntityRepository
             ->addSelect(sprintf('IFNULL((%s),0) as freqByPos', $qb2->getDql()))
             ->groupBy('p.id')
             ->orderBy('freqByPos DESC, p.afkorting', 'ASC')
-            ->setParameters($parameters);
+            ->setParameters(Util::buildParameters($parameters));
         $ret = $qb->getQuery()->getResult();
         $item->set($ret);
         $item->tag(self::CACHE_TAG);
@@ -164,7 +165,7 @@ class UitslagRepository extends ServiceEntityRepository
         if ($excludeZeros) {
             $qb->andWhere('u.rennerPunten > 0');
         }
-        $qb->setParameters(['seizoen' => $seizoen, 'renner' => $renner]);
+        $qb->setParameters(Util::buildParameters(['seizoen' => $seizoen, 'renner' => $renner]));
         return $qb->getQuery()->getResult();
     }
 
@@ -173,7 +174,7 @@ class UitslagRepository extends ServiceEntityRepository
         $seizoen = $this->resolveSeizoen($seizoen);
         $qb = $this->getPuntenForRennerQb();
         $qb->andWhere('w.seizoen = :seizoen');
-        $qb->setParameters(['seizoen' => $seizoen, 'renner' => $renner]);
+        $qb->setParameters(Util::buildParameters(['seizoen' => $seizoen, 'renner' => $renner]));
         $qb->add('select', 'SUM(u.rennerPunten)');
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -188,7 +189,7 @@ class UitslagRepository extends ServiceEntityRepository
         }
         $qb = $this->getPuntenForRennerQb();
         $qb->andWhere('w.seizoen = :seizoen')->andWhere('u.ploeg = :ploeg');
-        $qb->setParameters(['seizoen' => $seizoen, 'ploeg' => $ploeg, 'renner' => $renner]);
+        $qb->setParameters(Util::buildParameters(['seizoen' => $seizoen, 'ploeg' => $ploeg, 'renner' => $renner]));
         $qb->add('select', 'SUM(u.ploegPunten)');
         $res = $qb->getQuery()->getSingleScalarResult();
         $item->set($res);
@@ -393,7 +394,7 @@ class UitslagRepository extends ServiceEntityRepository
                 return $a->getRenner()->getId();
             }, $transfers)), [0])))
             ->andWhere('u.ploegPunten > 0')
-            ->setParameters($parameters)
+            ->setParameters(Util::buildParameters($parameters))
             ->orderBy('w.datum DESC, u.id', 'DESC');
         return $qb;
     }
@@ -419,7 +420,7 @@ class UitslagRepository extends ServiceEntityRepository
             ->andWhere('u.rennerPunten > 0')
             // ->andWhere('1=1')
             ->andWhere('(u.ploeg != :ploeg OR u.ploeg IS NULL) OR (u.ploeg = :ploeg AND u.ploegPunten = 0)')
-            ->setParameters($parameters)
+            ->setParameters(Util::buildParameters($parameters))
             ->orderBy('w.datum DESC, u.id', 'DESC');
         if ($start && $end) {
             $startEndWhere = '(w.datum >= :start AND w.datum <= :end)';
@@ -441,7 +442,7 @@ class UitslagRepository extends ServiceEntityRepository
             ->where('u.ploeg = :ploeg')
             ->andWhere('w.seizoen = :seizoen')
             ->andWhere('u.ploegPunten > 0')
-            ->setParameters($parameters)
+            ->setParameters(Util::buildParameters($parameters))
             ->orderBy('w.datum DESC, u.id', 'DESC');
     }
 
@@ -455,7 +456,7 @@ class UitslagRepository extends ServiceEntityRepository
             ->andWhere('w.seizoen = :seizoen')
             ->andWhere('u.ploegPunten > 0')
             ->andWhere('u.positie = :position')
-            ->setParameters($parameters)
+            ->setParameters(Util::buildParameters($parameters))
             ->orderBy('w.datum DESC, u.id', 'DESC');
     }
 
