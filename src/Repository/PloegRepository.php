@@ -11,9 +11,9 @@ use Doctrine\Persistence\ManagerRegistry;
 class PloegRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry                     $registry,
+        ManagerRegistry $registry,
         private readonly ContractRepository $contractRepository,
-        private readonly RennerRepository   $rennerRepository, private readonly ManagerRegistry $managerRegistry,
+        private readonly RennerRepository $rennerRepository, private readonly ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($registry, Ploeg::class);
     }

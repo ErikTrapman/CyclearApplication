@@ -13,8 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
 class RennerRepository extends ServiceEntityRepository
 {
     public function __construct(
-        ManagerRegistry                     $registry,
-        private readonly SeizoenRepository  $seizoenRepository,
+        ManagerRegistry $registry,
+        private readonly SeizoenRepository $seizoenRepository,
         private readonly ContractRepository $contractRepository, private readonly ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($registry, Renner::class);

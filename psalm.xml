@@ -16,7 +16,6 @@
         <directory name="tests" />
         <ignoreFiles>
             <file name="src/Kernel.php" />
-            <file name="src/Twitter/Twitter.php" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

@@ -15,12 +15,11 @@ class TransferRepository extends ServiceEntityRepository
     public const CACHE_TAG = 'TransferRepository';
 
     public function __construct(
-        ManagerRegistry                         $registry,
+        ManagerRegistry $registry,
         private readonly TagAwareCacheInterface $cache,
-        private readonly SeizoenRepository      $seizoenRepository,
-        private readonly PloegRepository        $ploegRepository, private readonly ManagerRegistry $managerRegistry,
-    )
-    {
+        private readonly SeizoenRepository $seizoenRepository,
+        private readonly PloegRepository $ploegRepository, private readonly ManagerRegistry $managerRegistry,
+    ) {
         parent::__construct($registry, Transfer::class);
     }
 
