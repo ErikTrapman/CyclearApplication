@@ -31,7 +31,7 @@
                 {% endif %}
 
                 <td class="hidden-xs hidden-sm">
-                    <a href="{{ path('ploeg_show', {seizoen: seizoen.slug, id: ploeg[0].id}) }}#!ploeg">{{ ploeg[0].naam }}</a>
+                    <a href="{{ path('ploeg_show', {seizoen: seizoen.slug, id: ploeg[0].id}) }}#!ploeg">{{ ploeg[0].naam|u.truncate(75, '&#8230;')|raw }}</a>
                 </td>
                 <td class="hidden-sm hidden-xs">{{ ploeg[0].afkorting }}</td>
                 <td class="hidden-lg hidden-md">
