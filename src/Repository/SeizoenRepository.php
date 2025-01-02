@@ -25,4 +25,13 @@ class SeizoenRepository extends ServiceEntityRepository
             ->orderBy('s.start', 'ASC')
             ->getQuery()->getResult();
     }
+
+    public function getMaxTransfers(): int
+    {
+        if (!$current = $this->getCurrent()) {
+            return 0;
+        }
+
+        return $current->getMaxTransfers();
+    }
 }

@@ -16,6 +16,7 @@ class SeizoenType extends AbstractType
             ->add('closed', null, ['required' => false])
             ->add('start')
             ->add('end')
-            ->add('maxPointsPerRider');
+            ->add('maxPointsPerRider')
+            ->add('maxTransfers');
     }
 }

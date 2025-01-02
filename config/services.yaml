@@ -19,7 +19,7 @@ services:
         # fetching services directly from the container via $container->get() won't work.
         # The best practice is to be explicit about your dependencies anyway.
         bind:
-            $maxTransfers: '%max_transfers%'
+            $maxTransfers: '@=service("App\\Repository\\SeizoenRepository").getMaxTransfers()'
             $matchesFeed: 'https://cqranking.com/men/asp/gen/RacesRecent.asp?changed=0'
             $cqRankingWedstrijdUrl: 'https://cqranking.com/men/asp/gen/race.asp?raceid='
             $baseUrl: 'https://cqranking.com/men/asp/gen/rider.asp?riderid='

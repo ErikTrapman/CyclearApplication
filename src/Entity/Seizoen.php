@@ -36,6 +36,9 @@ class Seizoen
     #[ORM\Column(type: 'integer', nullable: true, name: 'maxPointsPerRider')]
     private $maxPointsPerRider;
 
+    #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 0])]
+    private $maxTransfers;
+
     public function getId()
     {
         return $this->id;
@@ -104,6 +107,16 @@ class Seizoen
     public function setMaxPointsPerRider(int $maxPointsPerRider): void
     {
         $this->maxPointsPerRider = $maxPointsPerRider;
+    }
+
+    public function getMaxTransfers()
+    {
+        return $this->maxTransfers;
+    }
+
+    public function setMaxTransfers(int $maxTransfers): void
+    {
+        $this->maxTransfers = $maxTransfers;
     }
 
     public function __toString()
