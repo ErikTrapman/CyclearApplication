@@ -5,6 +5,7 @@ namespace App\Tests\Validator\Constraints;
 use App\Entity\Renner;
 use App\Entity\Seizoen;
 use App\Repository\RennerRepository;
+use App\Repository\SeizoenRepository;
 use App\Repository\TransferRepository;
 use App\Validator\Constraints\UserTransfer;
 use App\Validator\Constraints\UserTransferFixedValidator;
@@ -27,7 +28,9 @@ class UserTransferValidatorTest extends WebTestCase
     {
         $rennerRepository = $this->getMockBuilder(RennerRepository::class)->disableOriginalConstructor()->getMock();
         $transferRepository = $this->getMockBuilder(TransferRepository::class)->disableOriginalConstructor()->getMock();
-        return [$rennerRepository, $transferRepository];
+        $seizoenRepository = $this->getMockBuilder(SeizoenRepository::class)->disableOriginalConstructor()->getMock();
+        $seizoenRepository->method('getMaxTransfers')->willReturn(50);
+        return [$rennerRepository, $transferRepository, $seizoenRepository];
     }
 
     private function getValidTransfer(): \App\Form\Entity\UserTransfer
@@ -50,8 +53,8 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setClosed(true);
         $t->getSeizoen()->setIdentifier('1');
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }
@@ -63,10 +66,10 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setStart(new \DateTime('2013-05-21'));
         $t->getSeizoen()->setEnd(new \DateTime('2013-11-21'));
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
         $rennerRepository->method('getPloeg')->will($this->returnValue(null));
 
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }
@@ -78,10 +81,10 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setStart(new \DateTime('2013-04-30'));
         $t->getSeizoen()->setEnd(new \DateTime('2013-04-30'));
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
         $rennerRepository->method('getPloeg')->will($this->returnValue(null));
 
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }
@@ -94,11 +97,11 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setStart(new \DateTime('2013-01-01'));
         $t->getSeizoen()->setEnd(new \DateTime('2013-11-01'));
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
         $rennerRepository->method('getPloeg')->will($this->returnValue(null));
 
         $transferRepository->method('getTransferCountForUserTransfer')->will($this->returnValue(50));
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }
@@ -110,11 +113,11 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setStart(new \DateTime('2013-01-01'));
         $t->getSeizoen()->setEnd(new \DateTime('2013-05-01'));
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
         $rennerRepository->method('getPloeg')->will($this->returnValue(null));
 
         $transferRepository->expects($this->once())->method('getTransferCountForUserTransfer')->will($this->returnValue(0));
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }
@@ -126,11 +129,11 @@ class UserTransferValidatorTest extends WebTestCase
         $t->getSeizoen()->setStart(new \DateTime('2013-05-01'));
         $t->getSeizoen()->setEnd(new \DateTime('2013-11-01'));
 
-        list($rennerRepository, $transferRepository) = $this->getRepos();
+        list($rennerRepository, $transferRepository, $seizoenRepsitory) = $this->getRepos();
         $rennerRepository->method('getPloeg')->will($this->returnValue(null));
 
         $transferRepository->expects($this->once())->method('getTransferCountForUserTransfer')->will($this->returnValue(0));
-        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, 50);
+        $validator = new UserTransferFixedValidator($rennerRepository, $transferRepository, $seizoenRepsitory);
         $validator->initialize($this->context);
         $validator->validate($t, new UserTransfer());
     }

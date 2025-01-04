@@ -8,10 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class LoadRennerData extends Fixture
 {
-    /**
-     * @return void
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $r1 = new Renner();
         $r1->setNaam('RENNER Voornaam');

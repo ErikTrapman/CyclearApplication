@@ -7,7 +7,6 @@ parameters:
     logging_address: veggatron+cyclearlog@gmail.com
     corresponding_address: veggatron+cyclear@gmail.com
     version: 99
-    max_transfers: 50
     fos_user.model.user.class: App\Entity\User
 
 services:
@@ -19,7 +18,6 @@ services:
         # fetching services directly from the container via $container->get() won't work.
         # The best practice is to be explicit about your dependencies anyway.
         bind:
-            $maxTransfers: '@=service("App\\Repository\\SeizoenRepository").getMaxTransfers()'
             $matchesFeed: 'https://cqranking.com/men/asp/gen/RacesRecent.asp?changed=0'
             $cqRankingWedstrijdUrl: 'https://cqranking.com/men/asp/gen/race.asp?raceid='
             $baseUrl: 'https://cqranking.com/men/asp/gen/rider.asp?riderid='

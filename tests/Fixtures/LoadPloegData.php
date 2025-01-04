@@ -8,10 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class LoadPloegData extends Fixture
 {
-    /**
-     * @return void
-     */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $p1 = new Ploeg();
         $p1->setNaam('Ploeg 1');

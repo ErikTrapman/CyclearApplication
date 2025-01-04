@@ -7,7 +7,6 @@ use App\Entity\Renner;
 use App\Entity\Seizoen;
 use App\Entity\Transfer;
 use App\Repository\ContractRepository;
-use App\Repository\PeriodeRepository;
 use App\Repository\RennerRepository;
 use App\Repository\TransferRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,8 +19,6 @@ class TransferManager
         private readonly RennerRepository $rennerRepository,
         private readonly TransferRepository $transferRepository,
         private readonly ContractRepository $contractRepository,
-        private readonly PeriodeRepository $periodeRepository,
-        private $maxTransfers = null,
     ) {
     }
 
@@ -48,7 +45,7 @@ class TransferManager
         return true;
     }
 
-    public function createReleaseTransfer(Transfer $transfer, Ploeg $ploeg): Transfer
+    private function createReleaseTransfer(Transfer $transfer, Ploeg $ploeg): Transfer
     {
         $renner = $transfer->getRenner();
         $seizoen = $transfer->getSeizoen();
@@ -207,20 +204,11 @@ class TransferManager
     {
         $transferTypes = [Transfer::ADMINTRANSFER, Transfer::USERTRANSFER];
         $seizoen = $ploeg->getSeizoen();
-        if ($this->maxTransfers) {
-            return $this->transferRepository->getTransferCountByType($ploeg, $seizoen->getStart(), $seizoen->getEnd(), $transferTypes);
-        } else {
-            $periode = $this->periodeRepository->getCurrentPeriode($seizoen);
-            return $this->transferRepository->getTransferCountByType($ploeg, $periode->getStart(), $periode->getEind(), $transferTypes);
-        }
+        return $this->transferRepository->getTransferCountByType($ploeg, $seizoen->getStart(), $seizoen->getEnd(), $transferTypes);
     }
 
     public function getTtlTransfersAtm(Seizoen $seizoen)
     {
-        if ($this->maxTransfers) {
-            return $this->maxTransfers;
-        } else {
-            return $this->periodeRepository->getCurrentPeriode($seizoen)->getTransfers();
-        }
+        return $seizoen->getMaxTransfers();
     }
 }

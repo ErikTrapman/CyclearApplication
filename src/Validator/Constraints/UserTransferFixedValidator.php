@@ -3,6 +3,7 @@
 namespace App\Validator\Constraints;
 
 use App\Repository\RennerRepository;
+use App\Repository\SeizoenRepository;
 use App\Repository\TransferRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -12,7 +13,7 @@ class UserTransferFixedValidator extends ConstraintValidator
     public function __construct(
         private readonly RennerRepository $rennerRepository,
         private readonly TransferRepository $transferRepository,
-        private readonly int $maxTransfers,
+        private readonly SeizoenRepository $seizoenRepository,
     ) {
     }
 
@@ -51,8 +52,9 @@ class UserTransferFixedValidator extends ConstraintValidator
             $this->context->addViolation('Het huidige seizoen staat geen transfers meer toe.');
         }
         $transferCount = $this->transferRepository->getTransferCountForUserTransfer($value->getPloeg(), $seasonStart, $seasonEnd);
-        if ($transferCount >= $this->maxTransfers) {
-            $this->context->addViolation('Je zit op het maximaal aantal transfers van ' . $this->maxTransfers . '.');
+        $max = $this->seizoenRepository->getMaxTransfers();
+        if ($transferCount >= $max) {
+            $this->context->addViolation('Je zit op het maximaal aantal transfers van ' . $max . '.');
         }
     }
 }
