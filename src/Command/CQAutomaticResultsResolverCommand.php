@@ -35,23 +35,27 @@ class CQAutomaticResultsResolverCommand extends Command
 
         $em = $this->doctrine->getManager();
 
+        $seizoen = $this->seizoenRepository->getCurrent();
+        if (!$seizoen) {
+            return Command::SUCCESS;
+        }
+
         try {
-            $seizoen = $this->seizoenRepository->getCurrent();
-            if (!$seizoen) {
-                return Command::SUCCESS;
-            }
             $start = clone $seizoen->getStart();
             $end = clone $seizoen->getEnd();
             $races = $this->parser->getRecentRaces();
-
             foreach ($this->resolver->resolve($races, $seizoen, $start, $end, 100) as $match) {
                 $match->setFullyProcessed(true);
                 $em->persist($match);
+                $em->flush();
             }
-            $em->flush();
+        } catch (\Exception $exception) {
+            $output->writeln($exception->getMessage());
+            return Command::FAILURE;
         } finally {
             $this->release();
         }
+
         return Command::SUCCESS;
     }
 }

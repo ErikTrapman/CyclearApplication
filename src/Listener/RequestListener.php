@@ -33,7 +33,7 @@ class RequestListener
 
         if (null !== $request->get('seizoen')) {
             if (!$seizoen = $this->seizoenRepository->findOneBy(['slug' => $request->get('seizoen')])) {
-                throw new \UnexpectedValueException('Cannot locate Seizoen');
+                throw new \UnexpectedValueException('Cannot locate Seizoen for url ' . $request->getUri());
             }
         } else {
             $seizoen = $this->seizoenRepository->getCurrent();
