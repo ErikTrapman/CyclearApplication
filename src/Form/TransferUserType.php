@@ -3,15 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Renner;
-use App\Validator\Constraints as CyclearAssert;
+use App\Validator\Constraints\UserTransfer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @CyclearAssert\UserTransfer
- */
 class TransferUserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -21,7 +18,6 @@ class TransferUserType extends AbstractType
                 ->add('renner_in', RennerSelectorType::class, ['label' => 'Renner in', 'mapped' => 'rennerIn']);
         }
         if (null !== $options['renner_in']) {
-            $options['ploeg'];
             $ploegRenners = array_merge([0], $options['ploegRenners']);
             $builder
                 ->add('renner_uit', EntityType::class, [
@@ -41,7 +37,13 @@ class TransferUserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            ['renner_in' => null, 'renner_uit' => null, 'ploeg' => null, 'ploegRenners' => []]
+            [
+                'constraints' => [new UserTransfer()],
+                'renner_in' => null,
+                'renner_uit' => null,
+                'ploeg' => null,
+                'ploegRenners' => [],
+            ]
         );
     }
 }

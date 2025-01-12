@@ -4,9 +4,7 @@ namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 class UserTransfer extends Constraint
 {
     public $message = 'Je zit op het maximaal aantal transfers van %max% voor deze periode';
