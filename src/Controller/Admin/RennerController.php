@@ -24,8 +24,9 @@ class RennerController extends AbstractController
 {
     public function __construct(
         private readonly PaginatorInterface $paginator,
-        private readonly ManagerRegistry $doctrine,
-    ) {
+        private readonly ManagerRegistry    $doctrine,
+    )
+    {
     }
 
     #[Route(path: '/', name: 'admin_renner')]
@@ -41,7 +42,12 @@ class RennerController extends AbstractController
             $filter->handleRequest($request);
             if ($filter->isValid()) {
                 if ($filter->get('naam')->getData()) {
-                    $em->getFilters()->enable('naam')->setParameter('naam', $filter->get('naam')->getData(), Type::getType(Types::STRING)->getBindingType());
+                    $typeRegistry = Type::getTypeRegistry();
+                    $em->getFilters()->enable('naam')->setParameter(
+                        'naam',
+                        $filter->get('naam')->getData(),
+                        $typeRegistry->lookupName(Type::getType(Types::STRING))
+                    );
                 }
             }
         }
