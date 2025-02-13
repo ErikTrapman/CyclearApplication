@@ -1,11 +1,12 @@
 {% block content %}
-
     <table class="table table-bordered table-striped">
         <tr>
             <th colspan="3" class="hidden-sm hidden-xs">Ploeg</th>
             <th colspan="2" class="hidden-lg hidden-md">Ploeg</th>
             <th>Punten</th>
-            <th>Periode</th>
+            {% if withPeriode is defined and withPeriode %}
+                <th>Periode</th>
+            {% endif %}
         </tr>
         {% for ploeg in list %}
             <tr>
@@ -39,11 +40,12 @@
                 </td>
                 {% if shadowlist %}
                     <td>{{ ploeg.punten }}</td>
-                    <td>+{{ ploeg.punten - shadowlist[ploeg[0].id].punten }}</td>
+                    {% if withPeriode is defined and withPeriode %}
+                        <td>+{{ ploeg.punten - shadowlist[ploeg[0].id].punten }}</td>
+                    {% endif %}
                 {% else %}
                     <td>{{ ploeg.punten }}</td>
                 {% endif %}
-
             </tr>
         {% endfor %}
     </table>
