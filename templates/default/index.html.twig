@@ -65,8 +65,13 @@
         <div class="news" style="">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <p>{{ nieuws.content|nl2br }}</p>
+                    <div class="col-lg-12 index-news">
+                        {{ nieuws.content|raw|markdown_to_html }}
+                        <script>
+                            $(document).ready(function() {
+                                $('.index-news table').addClass('table table-bordered table-striped');
+                            });
+                        </script>
                         <p class="text-center">
                             <a href="{{ path('nieuws', {seizoen: seizoen.slug}) }}">Al het nieuws</a>
                         </p>

@@ -15,6 +15,7 @@
         "doctrine/orm": "^3.3.0",
         "friendsofsymfony/user-bundle": "^4",
         "knplabs/knp-paginator-bundle": "^6",
+        "league/commonmark": "^2.6",
         "stof/doctrine-extensions-bundle": "*",
         "symfony/acl-bundle": "^2.3",
         "symfony/asset": "^7",
@@ -65,6 +66,7 @@
         "symfony/yaml": "^7",
         "twig/extra-bundle": "^3.4",
         "twig/intl-extra": "^3.4",
+        "twig/markdown-extra": "^3.18",
         "twig/string-extra": "^3.18",
         "twig/twig": "^3"
     },
