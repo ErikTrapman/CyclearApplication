@@ -9,9 +9,15 @@
             {% endif %}
             <th>IN</th>
             <th>UIT</th>
-            <th>Datum</th>
+            <th class="hidden-sm hidden-xs">Datum</th>
         </tr>
+        {% set prev_date = null %}
         {% for transfer in listWithInversion %}
+            {% if prev_date is null or prev_date|date('dmY') != transfer.datum|date('dmY') %}
+                <th colspan="4" class="hidden-lg hidden-md">
+                    {{ transfer.datum|format_datetime(pattern='dd MMMM') }}
+                </th>
+            {% endif %}
             <tr>
                 {% if not fromTeamPage %}
                     <td>{% if transfer.ploegNaar %}
@@ -19,10 +25,12 @@
                 {% endif %}
                 <td>{{ include('renner/_singleRow.html.twig', {renner: transfer.renner, rennerPloeg: null, seizoen: transfer.seizoen}) }}
                 </td>
-                <td>{% if transfer.inversionTransfer %}
-                        {{ include('renner/_singleRow.html.twig', {renner: transfer.inversionTransfer.renner, rennerPloeg: null, seizoen: transfer.seizoen}) }}
-                    {% endif %}</td>
                 <td>
+                    {% if transfer.inversionTransfer %}
+                        {{ include('renner/_singleRow.html.twig', {renner: transfer.inversionTransfer.renner, rennerPloeg: null, seizoen: transfer.seizoen}) }}
+                    {% endif %}
+                </td>
+                <td class="hidden-sm hidden-xs">
                     <span data-toggle="tooltip" data-placement="top"
                           title="{{ transfer.datum|date('H:i') }}">{{ transfer.datum|format_datetime(pattern='dd MMM') }}</span>
                 </td>
@@ -34,6 +42,7 @@
                     </td>
                 </tr>
             {% endif %}
+            {% set prev_date = transfer.datum %}
         {% endfor %}
     </table>
     {% if includePagination %}
